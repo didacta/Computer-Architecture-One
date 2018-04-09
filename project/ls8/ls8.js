@@ -19,6 +19,19 @@ function loadMemory() {
         "00000001"  // HLT       Halt and quit
     ];
 
+    //     "10011001",
+    //     "00000000",
+    //     "00001000",
+    //     "10011001",
+    //     "00000001",
+    //     "00001001",
+    //     "10101010",
+    //     "00000000",
+    //     "00000001",
+    //     "01000011",
+    //     "00000000",
+    //     "00000001",
+
     // Load the program into the CPU's memory a byte at a time
     for (let i = 0; i < program.length; i++) {
         cpu.poke(i, parseInt(program[i], 2));

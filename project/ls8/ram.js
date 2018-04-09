@@ -13,7 +13,11 @@ class RAM {
     write(MAR, MDR) {
         // !!! IMPLEMENT ME
         // write the value in the MDR to the address MAR
+<<<<<<< Updated upstream
         return this.mem[MAR] = MDR;
+=======
+        this.mem[MAR] = MDR;
+>>>>>>> Stashed changes
     }
 
     /**
