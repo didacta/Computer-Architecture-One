@@ -79,9 +79,6 @@ class CPU {
     // right now.)
     let IR = this.reg.PC;
     // !!! IMPLEMENT ME
-    console.log("IR BEFORE", IR)
-    console.log("IR AFTER", IR.toString(2))
-
 
     // Debugging output
     // console.log(`THIS ${this.reg.PC}: ${IR.toString(2)}`);
