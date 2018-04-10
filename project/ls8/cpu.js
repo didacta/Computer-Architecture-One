@@ -106,8 +106,7 @@ class CPU {
     // for any particular instruction.
 
     let operandCount = (IR >>> 6) & 0b11;
-    let totalIntructionCount = operandCount + 1;
-    this.reg.PC += totalIntructionCount;
+    this.reg.PC += operandCount + 1;
 
     // !!! IMPLEMENT ME
   }
