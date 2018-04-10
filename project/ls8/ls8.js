@@ -42,7 +42,11 @@ function loadMemory() {
     //     '00000000',
     //     '00000001',
     // ]
-    let program = cleanFile;
+    let program = [];
+    cleanFile.forEach(line => {
+        if (line === '') return;
+        program.push(line);
+    });
 
     // Load the program into the CPU's memory a byte at a time
     for (let i = 0; i < program.length; i++) {
