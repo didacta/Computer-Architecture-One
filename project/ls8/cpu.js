@@ -5,6 +5,7 @@ const LDI = 0b10011001;
 const PRN = 0b01000011;
 const HLT = 0b00000001;
 const MUL = 0b10101010;
+const ADD = 0b10101000;
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -63,8 +64,12 @@ class CPU {
         console.log(this.reg[regA]);
         break;
       case MUL:
-        let result = this.reg[regA] * this.reg[regB];
-        this.reg[regA] = result;
+        let multiplication = this.reg[regA] * this.reg[regB];
+        this.reg[regA] = multiplication;
+        break;
+      case ADD:
+        let addition = this.reg[regA] + this.reg[regB];
+        this.reg[regA] = addition;
         break;
       case HLT:
         this.stopClock();
