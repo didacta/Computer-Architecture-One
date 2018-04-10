@@ -6,6 +6,9 @@ const PRN = 0b01000011;
 const HLT = 0b00000001;
 const MUL = 0b10101010;
 const ADD = 0b10101000;
+const CMP = 0b10100000;
+
+const FLBITS = 0b00000000;
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -101,6 +104,7 @@ class CPU {
 
     // Execute the instruction. Perform the actions for the instruction as
     // outlined in the LS-8 spec.
+    console.log("IR", IR, "  OPA", operandA, "  OPB", operandB)
     this.alu(IR, operandA, operandB);
 
     // !!! IMPLEMENT ME
@@ -111,6 +115,7 @@ class CPU {
     // for any particular instruction.
 
     let operandCount = (IR >>> 6) & 0b11;
+    console.log("OP", operandCount.toString(2))
     this.reg.PC += operandCount + 1;
 
     // !!! IMPLEMENT ME

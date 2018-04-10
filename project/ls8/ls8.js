@@ -10,8 +10,8 @@ const fs = require('fs');
 const filename = process.argv[2] + '';
 const file = fs.readFileSync(filename, 'binary').split('\n');
 const cleanFile = file.map(line => {
-    return line.replace(/\#.*/,'');
-});
+    return line.replace(/\#.*/,'').replace(/[^0-9]+/, '');
+}); // definitely don't understand regex well enough
 
 function loadMemory() {
 
@@ -44,10 +44,11 @@ function loadMemory() {
     // ]
     let program = [];
     cleanFile.forEach(line => {
-        if (line === '') return;
+        if (line === '' || line === '\r') return;
         program.push(line);
     });
 
+    console.log(program)
     // Load the program into the CPU's memory a byte at a time
     for (let i = 0; i < program.length; i++) {
         cpu.poke(i, parseInt(program[i], 2));
