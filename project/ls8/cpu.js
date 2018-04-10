@@ -1,7 +1,10 @@
 /**
  * LS-8 v2.0 emulator skeleton code
  */
-
+const LDI = 0b10011001;
+const PRN = 0b01000011;
+const HLT = 0b00000001;
+const MUL = 0b10101010;
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -53,18 +56,18 @@ class CPU {
    */
   alu(op, regA, regB) {
     switch (op) {
-      case 'MUL':
+      case LDI:
+        this.reg[regA] = regB;
+        break;
+      case PRN:
+        console.log(this.reg[regA]);
+        break;
+      case MUL:
         let result = this.reg[regA] * this.reg[regB];
         this.reg[regA] = result;
         break;
-      case 'HLT':
+      case HLT:
         this.stopClock();
-        break;
-      case 'LDI':
-        this.reg[regA] = regB;
-        break;
-      case 'PRN':
-        console.log(this.reg[regA]);
         break;
     }
   }
@@ -77,7 +80,7 @@ class CPU {
     // from the memory address pointed to by the PC. (I.e. the PC holds the
     // index into memory of the instruction that's about to be executed
     // right now.)
-    let IR = this.reg.PC;
+    let IR = this.ram.read(this.reg.PC);
     // !!! IMPLEMENT ME
 
     // Debugging output
@@ -86,32 +89,14 @@ class CPU {
     // Get the two bytes in memory _after_ the PC in case the instruction
     // needs them.
 
-    let operator = this.ram.read(IR);
-    let operandA = this.ram.read(IR + 1);
-    let operandB = this.ram.read(IR + 2);
-
-    if (operator === 153) {
-      operator = 'LDI';
-      this.reg.PC += 3;
-    }
-    if (operator === 67) {
-      operator = 'PRN';
-      this.reg.PC += 2;
-    }
-    if (operator === 1) {
-      operator = 'HLT';
-      this.reg.PC += 1;
-    }
-    if (operator === 170) {
-      operator = 'MUL';
-      this.reg.PC += 3;
-    }
+    let operandA = this.ram.read(this.reg.PC + 1);
+    let operandB = this.ram.read(this.reg.PC + 2);
 
     // !!! IMPLEMENT ME
 
     // Execute the instruction. Perform the actions for the instruction as
     // outlined in the LS-8 spec.
-    this.alu(operator, operandA, operandB);
+    this.alu(IR, operandA, operandB);
 
     // !!! IMPLEMENT ME
 
@@ -119,6 +104,10 @@ class CPU {
     // can be 1, 2, or 3 bytes long. Hint: the high 2 bits of the
     // instruction byte tells you how many bytes follow the instruction byte
     // for any particular instruction.
+
+    let operandCount = (IR >>> 6) & 0b11;
+    let totalIntructionCount = operandCount + 1;
+    this.reg.PC += totalIntructionCount;
 
     // !!! IMPLEMENT ME
   }
