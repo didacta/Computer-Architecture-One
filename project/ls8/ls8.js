@@ -7,14 +7,13 @@ const fs = require('fs');
  *
  * TODO: load this from a file on disk instead of having it hardcoded
  */
-const filename = process.argv[2] + '';
-const file = fs.readFileSync(filename, 'binary').split('\n');
-const cleanFile = file.map(line => {
-    return line.replace(/\#.*/,'').replace(/[^0-9]+/, '');
-}); // definitely don't understand regex well enough
 
 function loadMemory() {
-
+    const filename = process.argv[2] + '';
+    const file = fs.readFileSync(filename, 'binary').split('\n');
+    const cleanFile = file.map(line => {
+        return line.replace(/\#.*/,'').replace(/[^0-9]+/, '');
+    });
     // Hardcoded program to print the number 8 on the console
 
     //print8.ls8
