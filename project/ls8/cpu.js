@@ -1,3 +1,4 @@
+
 /**
  * LS-8 v2.0 emulator skeleton code
  */
@@ -7,6 +8,11 @@ const HLT = 0b00000001;
 const MUL = 0b10101010;
 const ADD = 0b10101000;
 const CMP = 0b10100000;
+const PUSH = 0b01001101;
+const POP = 0b01001100;
+
+const SP = 0b00000111;
+const KEYPRESSED = 0xf4;
 
 const FLBITS = 0b00000000;
 /**
@@ -23,8 +29,8 @@ class CPU {
 
     // Special-purpose registers
     this.reg.PC = 0; // Program Counter
-
     // this.setupBranchTable();
+    this.reg[SP] = KEYPRESSED;
   }
 
   /**
@@ -129,9 +135,19 @@ class CPU {
       case ADD:
         this.alu(IR, operandA, operandB);
         break;
+      case PUSH:
+        this.reg[SP]--;
+        this.ram.write(this.reg[SP], this.reg[operandA])
+        break;
+      case POP:
+        this.reg[operandA] = this.ram.read(this.reg[SP])
+        this.reg[SP]++;
+        break;
       case HLT:
         this.stopClock();
         break;
+      default:
+        console.log('Error');
     }
     // this.alu(IR, operandA, operandB);
 
@@ -167,25 +183,25 @@ class CPU {
   }
 }
 
-function handle_LDI(regA, regB) {
-  console.log(regA, regB);
-  console.log('1', this.reg);
+// function handle_LDI(regA, regB) {
+//   console.log(regA, regB);
+//   console.log('1', this.reg);
 
-  this.reg[regA] = regB;
-}
-function handle_PRN(regA) {
-  console.log('PRINT', this.reg[regA]);
-}
-function handle_MUL(regA, regB) {
-  let multiplication = this.reg[regA] * this.reg[regB];
-  this.reg[regA] = multiplication;
-}
-function handle_ADD(regA, regB) {
-  let addition = this.reg[regA] + this.reg[regB];
-  this.reg[regA] = addition;
-}
-function handle_HLT() {
-  this.stopClock();
-}
+//   this.reg[regA] = regB;
+// }
+// function handle_PRN(regA) {
+//   console.log('PRINT', this.reg[regA]);
+// }
+// function handle_MUL(regA, regB) {
+//   let multiplication = this.reg[regA] * this.reg[regB];
+//   this.reg[regA] = multiplication;
+// }
+// function handle_ADD(regA, regB) {
+//   let addition = this.reg[regA] + this.reg[regB];
+//   this.reg[regA] = addition;
+// }
+// function handle_HLT() {
+//   this.stopClock();
+// }
 
 module.exports = CPU;
