@@ -23,6 +23,8 @@ class CPU {
 
     // Special-purpose registers
     this.reg.PC = 0; // Program Counter
+
+    // this.setupBranchTable();
   }
 
   /**
@@ -58,26 +60,45 @@ class CPU {
    *
    * op can be: ADD SUB MUL DIV INC DEC CMP
    */
-  alu(op, regA, regB) {
-    switch (op) {
-      case LDI:
-        this.reg[regA] = regB;
-        break;
-      case PRN:
-        console.log(this.reg[regA]);
-        break;
-      case MUL:
-        let multiplication = this.reg[regA] * this.reg[regB];
-        this.reg[regA] = multiplication;
-        break;
-      case ADD:
-        let addition = this.reg[regA] + this.reg[regB];
-        this.reg[regA] = addition;
-        break;
-      case HLT:
-        this.stopClock();
-        break;
-    }
+  // alu(op, regA, regB) {
+  //   switch (op) {
+  //     case LDI:
+  //       this.reg[regA] = regB;
+  //       break;
+  //     case PRN:
+  //       console.log("PRINT", this.reg[regA]);
+  //       break;
+  //     case MUL:
+  //       let multiplication = this.reg[regA] * this.reg[regB];
+  //       this.reg[regA] = multiplication;
+  //       break;
+  //     case ADD:
+  //       let addition = this.reg[regA] + this.reg[regB];
+  //       this.reg[regA] = addition;
+  //       break;
+  //     case HLT:
+  //       this.stopClock();
+  //       break;
+  //   }
+  // }
+
+  handle_LDI(regA, regB) {
+    console.log('REG', this.reg);
+    this.reg[regA] = regB;
+  }
+  handle_PRN(regA) {
+    console.log('PRINT', this.reg[regA]);
+  }
+  handle_MUL(regA, regB) {
+    let multiplication = this.reg[regA] * this.reg[regB];
+    this.reg[regA] = multiplication;
+  }
+  handle_ADD(regA, regB) {
+    let addition = this.reg[regA] + this.reg[regB];
+    this.reg[regA] = addition;
+  }
+  handle_HLT() {
+    this.stopClock();
   }
 
   /**
@@ -104,8 +125,26 @@ class CPU {
 
     // Execute the instruction. Perform the actions for the instruction as
     // outlined in the LS-8 spec.
-    console.log("IR", IR, "  OPA", operandA, "  OPB", operandB)
-    this.alu(IR, operandA, operandB);
+    // this.alu(IR, operandA, operandB);
+
+    let branchTable = {};
+    // branchTable[LDI] = handle_LDI;
+    // branchTable[PRN] = handle_PRN;
+    // branchTable[MUL] = handle_MUL;
+    // branchTable[ADD] = handle_ADD;
+    // branchTable[HLT] = handle_HLT;
+    branchTable[LDI] = this.handle_LDI;
+    branchTable[PRN] = this.handle_PRN;
+    branchTable[MUL] = this.handle_MUL;
+    branchTable[ADD] = this.handle_ADD;
+    branchTable[HLT] = this.handle_HLT;
+
+    let handler = branchTable[IR];
+    console.log("BRANCH", branchTable[IR])
+    console.log("HANDLER", handler)
+    this.handle_LDI(operandA, operandB)
+    handler(operandA, operandB);
+
 
     // !!! IMPLEMENT ME
 
@@ -115,11 +154,31 @@ class CPU {
     // for any particular instruction.
 
     let operandCount = (IR >>> 6) & 0b11;
-    console.log("OP", operandCount.toString(2))
     this.reg.PC += operandCount + 1;
 
     // !!! IMPLEMENT ME
   }
+}
+
+function handle_LDI(regA, regB) {
+  console.log(regA, regB);
+  console.log('1', this.reg);
+
+  this.reg[regA] = regB;
+}
+function handle_PRN(regA) {
+  console.log('PRINT', this.reg[regA]);
+}
+function handle_MUL(regA, regB) {
+  let multiplication = this.reg[regA] * this.reg[regB];
+  this.reg[regA] = multiplication;
+}
+function handle_ADD(regA, regB) {
+  let addition = this.reg[regA] + this.reg[regB];
+  this.reg[regA] = addition;
+}
+function handle_HLT() {
+  this.stopClock();
 }
 
 module.exports = CPU;

@@ -48,7 +48,6 @@ function loadMemory() {
         program.push(line);
     });
 
-    console.log(program)
     // Load the program into the CPU's memory a byte at a time
     for (let i = 0; i < program.length; i++) {
         cpu.poke(i, parseInt(program[i], 2));
