@@ -29,6 +29,7 @@ class CPU {
     this.reg.PC = 0; // Program Counter
     this.reg[SP] = KEYPRESSEDADDRESS;
     this.setupBranchTable();
+    this.pcAdvance = true;
   }
 
   setupBranchTable() {
@@ -41,6 +42,8 @@ class CPU {
     bt[POP] = this.handle_POP;
     bt[PUSH] = this.handle_PUSH;
     bt[PRN] = this.handle_PRN;
+    bt[CALL] = this.handle_CALL;
+    bt[RET] = this.handle_RET;
 
     // Bind all the functions to this so we can call them later
     for (let k of Object.keys(bt)) {
@@ -49,7 +52,6 @@ class CPU {
 
     this.branchTable = bt;
   }
-  
 
   /**
    * Store value in memory address, useful for program loading
@@ -109,7 +111,7 @@ class CPU {
     // !!! IMPLEMENT ME
 
     // Debugging output
-    // console.log(`${this.reg.PC}: ${IR.toString(2)}`);
+    console.log(`${this.reg.PC}: ${IR.toString(2)}`);
 
     // Get the two bytes in memory _after_ the PC in case the instruction
     // needs them.
@@ -117,7 +119,7 @@ class CPU {
     let operandA = this.ram.read(this.reg.PC + 1);
     let operandB = this.ram.read(this.reg.PC + 2);
 
-    // !!! IMPLEMENT ME
+    this.advancePC = true;
 
     const handler = this.branchTable[IR];
     handler(operandA, operandB);
@@ -131,8 +133,10 @@ class CPU {
     // instruction byte tells you how many bytes follow the instruction byte
     // for any particular instruction.
 
-    let operandCount = (IR >>> 6) & 0b11;
-    this.reg.PC += operandCount + 1;
+    if (this.advancePC) {
+      let operandCount = (IR >>> 6) & 0b11;
+      this.reg.PC += operandCount + 1;
+    }
 
     // !!! IMPLEMENT ME
   }
@@ -165,6 +169,17 @@ class CPU {
   handle_PUSH(regA) {
     this.reg[SP]--;
     this.ram.write(this.reg[SP], this.reg[regA]);
+  }
+
+  handle_CALL(regA) {
+    this.reg.PC += 2;
+    this.reg[SP] = regA;
+    this.advancePC = false;
+  }
+
+  handle_RET() {
+    this.reg.PC = this.ram.read(this.reg[SP]);
+    this.advancePC = false;
   }
 }
 
