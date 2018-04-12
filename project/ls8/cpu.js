@@ -1,4 +1,3 @@
-
 /**
  * LS-8 v2.0 emulator skeleton code
  */
@@ -12,9 +11,7 @@ const PUSH = 0b01001101;
 const POP = 0b01001100;
 
 const SP = 0b00000111;
-const KEYPRESSED = 0xf4;
-
-const FLBITS = 0b00000000;
+const KEYPRESSEDADDRESS = 0xf4; //address above start of stack
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -24,13 +21,11 @@ class CPU {
    */
   constructor(ram) {
     this.ram = ram;
-
     this.reg = new Array(8).fill(0); // General-purpose registers R0-R7
 
     // Special-purpose registers
     this.reg.PC = 0; // Program Counter
-    // this.setupBranchTable();
-    this.reg[SP] = KEYPRESSED;
+    this.reg[SP] = KEYPRESSEDADDRESS;
   }
 
   /**
@@ -79,25 +74,6 @@ class CPU {
     }
   }
 
-  // handle_LDI(regA, regB) {
-  //   console.log('REG', this.reg);
-  //   this.reg[regA] = regB;
-  // }
-  // handle_PRN(regA) {
-  //   console.log('PRINT', this.reg[regA]);
-  // }
-  // handle_MUL(regA, regB) {
-  //   let multiplication = this.reg[regA] * this.reg[regB];
-  //   this.reg[regA] = multiplication;
-  // }
-  // handle_ADD(regA, regB) {
-  //   let addition = this.reg[regA] + this.reg[regB];
-  //   this.reg[regA] = addition;
-  // }
-  // handle_HLT() {
-  //   this.stopClock();
-  // }
-
   /**
    * Advances the CPU one cycle
    */
@@ -110,7 +86,7 @@ class CPU {
     // !!! IMPLEMENT ME
 
     // Debugging output
-    // console.log(`THIS ${this.reg.PC}: ${IR.toString(2)}`);
+    // console.log(`${this.reg.PC}: ${IR.toString(2)}`);
 
     // Get the two bytes in memory _after_ the PC in case the instruction
     // needs them.
@@ -137,10 +113,10 @@ class CPU {
         break;
       case PUSH:
         this.reg[SP]--;
-        this.ram.write(this.reg[SP], this.reg[operandA])
+        this.ram.write(this.reg[SP], this.reg[operandA]);
         break;
       case POP:
-        this.reg[operandA] = this.ram.read(this.reg[SP])
+        this.reg[operandA] = this.ram.read(this.reg[SP]);
         this.reg[SP]++;
         break;
       case HLT:
@@ -149,26 +125,6 @@ class CPU {
       default:
         console.log('Error');
     }
-    // this.alu(IR, operandA, operandB);
-
-    // let branchTable = {};
-    // // branchTable[LDI] = handle_LDI;
-    // // branchTable[PRN] = handle_PRN;
-    // // branchTable[MUL] = handle_MUL;
-    // // branchTable[ADD] = handle_ADD;
-    // // branchTable[HLT] = handle_HLT;
-    // branchTable[LDI] = this.handle_LDI;
-    // branchTable[PRN] = this.handle_PRN;
-    // branchTable[MUL] = this.handle_MUL;
-    // branchTable[ADD] = this.handle_ADD;
-    // branchTable[HLT] = this.handle_HLT;
-
-    // let handler = branchTable[IR];
-    // console.log("BRANCH", branchTable[IR])
-    // console.log("HANDLER", handler)
-    // this.handle_LDI(operandA, operandB)
-    // handler(operandA, operandB);
-
     // !!! IMPLEMENT ME
 
     // Increment the PC register to go to the next instruction. Instructions
@@ -182,26 +138,5 @@ class CPU {
     // !!! IMPLEMENT ME
   }
 }
-
-// function handle_LDI(regA, regB) {
-//   console.log(regA, regB);
-//   console.log('1', this.reg);
-
-//   this.reg[regA] = regB;
-// }
-// function handle_PRN(regA) {
-//   console.log('PRINT', this.reg[regA]);
-// }
-// function handle_MUL(regA, regB) {
-//   let multiplication = this.reg[regA] * this.reg[regB];
-//   this.reg[regA] = multiplication;
-// }
-// function handle_ADD(regA, regB) {
-//   let addition = this.reg[regA] + this.reg[regB];
-//   this.reg[regA] = addition;
-// }
-// function handle_HLT() {
-//   this.stopClock();
-// }
 
 module.exports = CPU;
