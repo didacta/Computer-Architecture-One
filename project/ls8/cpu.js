@@ -9,6 +9,8 @@ const ADD = 0b10101000;
 const CMP = 0b10100000;
 const PUSH = 0b01001101;
 const POP = 0b01001100;
+const CALL = 0b01001000;
+const RET = 0b00001001;
 
 const SP = 0b00000111;
 const KEYPRESSEDADDRESS = 0xf4; //address above start of stack
@@ -26,7 +28,28 @@ class CPU {
     // Special-purpose registers
     this.reg.PC = 0; // Program Counter
     this.reg[SP] = KEYPRESSEDADDRESS;
+    this.setupBranchTable();
   }
+
+  setupBranchTable() {
+    let bt = {};
+
+    bt[ADD] = this.handle_ADD;
+    bt[HLT] = this.handle_HLT;
+    bt[LDI] = this.handle_LDI;
+    bt[MUL] = this.handle_MUL;
+    bt[POP] = this.handle_POP;
+    bt[PUSH] = this.handle_PUSH;
+    bt[PRN] = this.handle_PRN;
+
+    // Bind all the functions to this so we can call them later
+    for (let k of Object.keys(bt)) {
+      bt[k] = bt[k].bind(this);
+    }
+
+    this.branchTable = bt;
+  }
+  
 
   /**
    * Store value in memory address, useful for program loading
@@ -96,35 +119,11 @@ class CPU {
 
     // !!! IMPLEMENT ME
 
+    const handler = this.branchTable[IR];
+    handler(operandA, operandB);
+
     // Execute the instruction. Perform the actions for the instruction as
     // outlined in the LS-8 spec.
-    switch (IR) {
-      case LDI:
-        this.reg[operandA] = operandB;
-        break;
-      case PRN:
-        console.log('PRINT', this.reg[operandA]);
-        break;
-      case MUL:
-        this.alu(IR, operandA, operandB);
-        break;
-      case ADD:
-        this.alu(IR, operandA, operandB);
-        break;
-      case PUSH:
-        this.reg[SP]--;
-        this.ram.write(this.reg[SP], this.reg[operandA]);
-        break;
-      case POP:
-        this.reg[operandA] = this.ram.read(this.reg[SP]);
-        this.reg[SP]++;
-        break;
-      case HLT:
-        this.stopClock();
-        break;
-      default:
-        console.log('Error');
-    }
     // !!! IMPLEMENT ME
 
     // Increment the PC register to go to the next instruction. Instructions
@@ -136,6 +135,36 @@ class CPU {
     this.reg.PC += operandCount + 1;
 
     // !!! IMPLEMENT ME
+  }
+
+  handle_ADD(regA, regB) {
+    this.alu(ADD, regA, regB);
+  }
+
+  handle_HLT() {
+    this.stopClock();
+  }
+
+  handle_LDI(regA, regB) {
+    this.reg[regA] = regB;
+  }
+
+  handle_MUL(regA, regB) {
+    this.alu(MUL, regA, regB);
+  }
+
+  handle_POP(regA) {
+    this.reg[regA] = this.ram.read(this.reg[SP]);
+    this.reg[SP]++;
+  }
+
+  handle_PRN(regA) {
+    console.log(this.reg[regA]);
+  }
+
+  handle_PUSH(regA) {
+    this.reg[SP]--;
+    this.ram.write(this.reg[SP], this.reg[regA]);
   }
 }
 
