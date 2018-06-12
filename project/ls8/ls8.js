@@ -4,8 +4,6 @@ const fs = require('fs');
 
 /**
  * Load an LS8 program into memory
- *
- * TODO: load this from a file on disk instead of having it hardcoded
  */
 
 function loadMemory() {

@@ -29,7 +29,7 @@ class CPU {
     this.reg.PC = 0; // Program Counter
     this.reg[SP] = KEYPRESSEDADDRESS;
     this.setupBranchTable();
-    this.pcAdvance = true;
+    this.advancePC = true;
   }
 
   setupBranchTable() {
@@ -108,7 +108,6 @@ class CPU {
     // index into memory of the instruction that's about to be executed
     // right now.)
     let IR = this.ram.read(this.reg.PC);
-    // !!! IMPLEMENT ME
 
     // Debugging output
     console.log(`${this.reg.PC}: ${IR.toString(2)}`);
@@ -124,10 +123,6 @@ class CPU {
     const handler = this.branchTable[IR];
     handler(operandA, operandB);
 
-    // Execute the instruction. Perform the actions for the instruction as
-    // outlined in the LS-8 spec.
-    // !!! IMPLEMENT ME
-
     // Increment the PC register to go to the next instruction. Instructions
     // can be 1, 2, or 3 bytes long. Hint: the high 2 bits of the
     // instruction byte tells you how many bytes follow the instruction byte
@@ -137,8 +132,6 @@ class CPU {
       let operandCount = (IR >>> 6) & 0b11;
       this.reg.PC += operandCount + 1;
     }
-
-    // !!! IMPLEMENT ME
   }
 
   handle_ADD(regA, regB) {
@@ -157,9 +150,17 @@ class CPU {
     this.alu(MUL, regA, regB);
   }
 
-  handle_POP(regA) {
-    this.reg[regA] = this.ram.read(this.reg[SP]);
-    this.reg[SP]++;
+  handle_POP(regA=null) {
+    if(regA === null) {
+      let value = this.ram.read(this.reg[SP]);
+      this.reg[SP]++;
+      return value;
+    }
+    else {
+      let value = this.ram.read(this.reg[SP]);
+      this.reg[SP]++;
+      this.reg[regA] = value;
+    }
   }
 
   handle_PRN(regA) {
@@ -167,18 +168,26 @@ class CPU {
   }
 
   handle_PUSH(regA) {
-    this.reg[SP]--;
-    this.ram.write(this.reg[SP], this.reg[regA]);
+    if(regA === 0){
+      this.reg[SP]--;
+      this.ram.write(this.reg[SP], this.reg[regA]);
+    }
+    else {
+      this.reg[SP]--;
+      this.ram.write(this.reg[SP], regA);
+    }  
   }
 
   handle_CALL(regA) {
-    this.reg.PC += 2;
-    this.reg[SP] = regA;
+    // Save the return address on the stack
+    this.handle_PUSH(this.reg.PC + 2); // +2 to make the next instruction the return address
+    // Set PC so we start executing here
+    this.reg.PC = this.reg[regA];
     this.advancePC = false;
   }
 
   handle_RET() {
-    this.reg.PC = this.ram.read(this.reg[SP]);
+    this.reg.PC = this.handle_POP();
     this.advancePC = false;
   }
 }
